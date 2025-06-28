@@ -14,7 +14,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-// Classe MIPS_GUI (Conforme fornecido pelo usuário na última interação)
+/**
+ * Define a interface gráfica (GUI) para o Simulador MIPS.
+ * Esta classe é responsável por criar a janela, os botões, as áreas de texto
+ * e por gerenciar as interações do usuário, como carregar arquivos,
+ * executar o código e exibir os resultados da simulação.
+ */
 public class MIPS_GUI extends JFrame {
     private SimuladorMIPS32 simulador;
 
@@ -23,7 +28,7 @@ public class MIPS_GUI extends JFrame {
     private JButton botaoResetar;
     private JButton botaoRelatorio;
 
-    private JTextArea areaEditorCodigo; // Novo: Editor de código MIPS
+    private JTextArea areaEditorCodigo;
     private JTextArea areaRegistradores;
     private JTextArea areaBinarios;
     private JTextArea areaSaidas;
@@ -34,15 +39,14 @@ public class MIPS_GUI extends JFrame {
         this.simulador = new SimuladorMIPS32();
         setTitle("Simulador MIPS32 - Edição Java com Editor");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200, 800); // Aumentar um pouco o tamanho para o editor
+        setSize(1200, 800);
         setLocationRelativeTo(null);
 
-        // --- Painel Superior para Botões (Mantido como antes) ---
         JPanel painelSuperior = new JPanel(new GridBagLayout());
         GridBagConstraints gbcBotoes = new GridBagConstraints();
 
-        botaoCarregar = new JButton("Carregar Arquivo"); // Texto alterado para clareza
-        botaoExecutar = new JButton("Executar Código do Editor"); // Texto alterado
+        botaoCarregar = new JButton("Carregar Arquivo");
+        botaoExecutar = new JButton("Executar Código do Editor");
         botaoResetar = new JButton("Resetar");
         botaoRelatorio = new JButton("Gerar Relatório");
 
@@ -72,16 +76,12 @@ public class MIPS_GUI extends JFrame {
         gbcBotoes.insets = new Insets(0,0,0,0);
         painelSuperior.add(Box.createHorizontalGlue(), gbcBotoes);
 
-        // --- Área Central com Editor e Saídas ---
-        // Novo: Editor de Código MIPS
         areaEditorCodigo = new JTextArea();
-        areaEditorCodigo.setFont(new Font("Monospaced", Font.PLAIN, 14)); // Fonte monoespaçada para código
+        areaEditorCodigo.setFont(new Font("Monospaced", Font.PLAIN, 14));
         areaEditorCodigo.setToolTipText("Digite ou cole seu código MIPS aqui. Use .data e .text para as seções.");
         JScrollPane scrollEditor = new JScrollPane(areaEditorCodigo);
         scrollEditor.setBorder(BorderFactory.createTitledBorder("Editor de Código MIPS"));
 
-
-        // Painel para as áreas de saída (à direita do JSplitPane)
         JPanel painelDireitoSaidas = new JPanel(new GridBagLayout());
         GridBagConstraints gbcAreasTexto = new GridBagConstraints();
 
@@ -90,7 +90,6 @@ public class MIPS_GUI extends JFrame {
         areaRegistradores.setFont(new Font("Monospaced", Font.PLAIN, 12));
         JScrollPane scrollRegs = new JScrollPane(areaRegistradores);
         scrollRegs.setBorder(BorderFactory.createTitledBorder("Registradores"));
-
 
         areaDadosVetores = new JTextArea("Dados e Vetores:\n");
         areaDadosVetores.setEditable(false);
@@ -110,13 +109,11 @@ public class MIPS_GUI extends JFrame {
         JScrollPane scrollSaidas = new JScrollPane(areaSaidas);
         scrollSaidas.setBorder(BorderFactory.createTitledBorder("Saídas (Console)"));
 
-        // Configurações para as áreas de texto no painelDireitoSaidas
         gbcAreasTexto.fill = GridBagConstraints.BOTH;
         gbcAreasTexto.weightx = 1.0;
         gbcAreasTexto.weighty = 1.0;
-        gbcAreasTexto.insets = new Insets(2, 2, 2, 2); // Espaçamento menor
+        gbcAreasTexto.insets = new Insets(2, 2, 2, 2);
 
-        // Layout 2x2 para as áreas de saída
         gbcAreasTexto.gridx = 0; gbcAreasTexto.gridy = 0;
         painelDireitoSaidas.add(scrollRegs, gbcAreasTexto);
         gbcAreasTexto.gridx = 1; gbcAreasTexto.gridy = 0;
@@ -126,16 +123,13 @@ public class MIPS_GUI extends JFrame {
         gbcAreasTexto.gridx = 1; gbcAreasTexto.gridy = 1;
         painelDireitoSaidas.add(scrollSaidas, gbcAreasTexto);
 
-        // JSplitPane para dividir editor e saídas
         JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollEditor, painelDireitoSaidas);
-        mainSplitPane.setDividerLocation(500); // Posição inicial do divisor
-        mainSplitPane.setResizeWeight(0.4); // Como o espaço é distribuído ao redimensionar
+        mainSplitPane.setDividerLocation(500);
+        mainSplitPane.setResizeWeight(0.4);
 
-        // Adicionar painéis ao Frame
         add(painelSuperior, BorderLayout.NORTH);
-        add(mainSplitPane, BorderLayout.CENTER); // Adiciona o JSplitPane ao centro
+        add(mainSplitPane, BorderLayout.CENTER);
 
-        // --- Listeners dos Botões ---
         botaoCarregar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -164,45 +158,43 @@ public class MIPS_GUI extends JFrame {
             }
         });
 
-        // Inicializar exibição
         atualizarInterface();
         areaEditorCodigo.setText(
             ".data\n" +
             "msg: .asciiz \"Digite um numero: \"\n" +
             "resultado_msg: .asciiz \"\\nO numero digitado foi: \"\n" +
-            "array1: .word 10, 20, 30, 40\n" + // Exemplo para lw/sw
-            "val1: .word 100\n"+               // Exemplo para lw/sw
+            "array1: .word 10, 20, 30, 40\n" +
+            "val1: .word 100\n"+
             "newline: .asciiz \"\\n\"\n" +
             "\n.text\n" +
             "main:\n" +
-            "    li $v0, 4           # syscall para imprimir string\n" +
-            "    la $a0, msg         # carrega endereço da mensagem 'msg'\n" +
+            "    li $v0, 4\n" +
+            "    la $a0, msg\n" +
             "    syscall\n" +
             "\n" +
-            "    li $v0, 5           # syscall para ler inteiro\n" +
+            "    li $v0, 5\n" +
             "    syscall\n" +
-            "    move $s0, $v0       # guarda o inteiro lido em $s0\n" +
+            "    move $s0, $v0\n" +
             "\n" +
-            "    li $v0, 4           # syscall para imprimir string\n" +
-            "    la $a0, resultado_msg # carrega endereço da mensagem 'resultado_msg'\n" +
-            "    syscall\n" +
-            "\n" +
-            "    li $v0, 1           # syscall para imprimir inteiro\n" +
-            "    move $a0, $s0       # move o inteiro de $s0 para $a0 para impressão\n" +
+            "    li $v0, 4\n" +
+            "    la $a0, resultado_msg\n" +
             "    syscall\n" +
             "\n" +
-            "    # Exemplo lw/sw\n" +
-            "    lw $t0, array1      # Carrega array1[0] (10) em $t0\n" +
-            "    addi $t0, $t0, 5    # $t0 = 15\n" +
-            "    sw $t0, 4(array1)   # Salva 15 em array1[1] (originalmente 20)\n" +
-            "    lw $t1, val1        # Carrega val1 (100) em $t1\n" +
-            "    sw $s0, val1        # Salva o numero digitado em val1\n"+
+            "    li $v0, 1\n" +
+            "    move $a0, $s0\n" +
+            "    syscall\n" +
             "\n" +
-            "    li $v0, 4           # syscall para imprimir string (nova linha)\n" +
+            "    lw $t0, array1\n" +
+            "    addi $t0, $t0, 5\n" +
+            "    sw $t0, 4(array1)\n" +
+            "    lw $t1, val1\n" +
+            "    sw $s0, val1\n"+
+            "\n" +
+            "    li $v0, 4\n" +
             "    la $a0, newline\n" +
             "    syscall\n" +
             "\n" +
-            "    li $v0, 10          # syscall para terminar o programa\n" +
+            "    li $v0, 10\n" +
             "    syscall\n"
         );
         areaEditorCodigo.setCaretPosition(0);
@@ -290,7 +282,6 @@ public class MIPS_GUI extends JFrame {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File arquivoParaSalvar = fileChooser.getSelectedFile();
             if (simulador != null) {
-                // Passando o código do editor para o relatório
                 boolean sucesso = simulador.gerarRelatorio(arquivoParaSalvar.getAbsolutePath(), areaEditorCodigo.getText());
                 if (sucesso) {
                     JOptionPane.showMessageDialog(this, "Relatório salvo em: " + arquivoParaSalvar.getAbsolutePath(), "Relatório Salvo", JOptionPane.INFORMATION_MESSAGE);
@@ -318,16 +309,21 @@ public class MIPS_GUI extends JFrame {
     }
 }
 
-// Classe SimuladorMIPS32 (Com lw/sw implementados e compatível com a GUI)
+/**
+ * Contém a lógica central do simulador MIPS.
+ * Esta classe é responsável por analisar o código assembly (parsing), gerenciar o
+ * estado dos registradores e da memória simulada, e executar cada instrução MIPS,
+ * tratando operações aritméticas, acesso à memória e chamadas de sistema (syscalls).
+ */
 class SimuladorMIPS32 {
     private Map<String, Integer> registradores;
-    private int cont; // Contador de Programa (Program Counter - índice da instrução)
-    private List<String> instrucoes; // Lista de instruções assembly a serem executadas
-    private List<String> saidas; // Saídas do programa (ex: syscalls)
-    private List<String> bin; // Representação binária (simplificada) das instruções executadas
-    private Map<String, Integer> rotulos; // Mapeia labels para índices de instrução na lista 'instrucoes'
-    private Map<String, Object> dados; // Armazena dados da seção .data (ex: .asciiz, .word únicos)
-    private Map<String, ArrayList<Integer>> vetores; // Armazena arrays da seção .data (ex: .word[], .space)
+    private int cont;
+    private List<String> instrucoes;
+    private List<String> saidas;
+    private List<String> bin;
+    private Map<String, Integer> rotulos;
+    private Map<String, Object> dados;
+    private Map<String, ArrayList<Integer>> vetores;
 
     public SimuladorMIPS32() {
         this.registradores = inicializarRegistradores();
@@ -338,7 +334,7 @@ class SimuladorMIPS32 {
         this.rotulos = new HashMap<>();
         this.dados = new HashMap<>();
         this.vetores = new HashMap<>();
-        resetar(); // Garante estado inicial limpo
+        resetar();
     }
 
     private Map<String, Integer> inicializarRegistradores() {
@@ -352,7 +348,6 @@ class SimuladorMIPS32 {
         for (String nome : regNomes) {
             regs.put(nome, 0);
         }
-        // regs.put("$sp", 0x7ffffffc); // Exemplo
         return regs;
     }
 
@@ -363,7 +358,6 @@ class SimuladorMIPS32 {
         }
     }
     
-    // Mantido para possível uso futuro ou consistência, embora a GUI use DeString
     public void carregarInstrucoes(String nomeArquivo) throws IOException {
         resetar();
         try (BufferedReader leitor = new BufferedReader(new FileReader(nomeArquivo, StandardCharsets.UTF_8))) {
@@ -396,7 +390,6 @@ class SimuladorMIPS32 {
                 if (!linha.startsWith(".")) {
                     secaoAtual = "text";
                 } else {
-                    // System.err.println("Linha " + linhaNum + ": Diretiva '" + linha + "' fora de .data ou .text. Ignorando.");
                     continue;
                 }
             }
@@ -480,7 +473,6 @@ class SimuladorMIPS32 {
             String instrucaoBinario = traduzirParaBinario(instrucaoAtual);
             bin.add("Inst. [" + String.format("%03d", pcAntesDaExecucao) + "] (0x" + String.format("%08X", 0x00400000 + pcAntesDaExecucao * 4) + "): " + instrucaoAtual + " -> " + instrucaoBinario);
 
-
             if (instrucaoAtual.trim().toLowerCase().startsWith("syscall")) {
                 executarSyscall();
                 if (cont == pcAntesDaExecucao && registradores.getOrDefault("$v0",0) != 10) {
@@ -502,10 +494,10 @@ class SimuladorMIPS32 {
     private void executarSyscall() {
         int v0 = registradores.getOrDefault("$v0", 0);
         switch (v0) {
-            case 1: // Imprimir inteiro
+            case 1:
                 saidas.add(String.valueOf(registradores.getOrDefault("$a0", 0)));
                 break;
-            case 4: // Imprimir string
+            case 4:
                 int enderecoOuHash = registradores.getOrDefault("$a0", 0);
                 boolean found = false;
                 for (Map.Entry<String, Object> entry : dados.entrySet()) {
@@ -519,13 +511,13 @@ class SimuladorMIPS32 {
                     saidas.add("<Erro: Syscall 4: Label para $a0 (hash: " + enderecoOuHash + ") não encontrado ou não é .asciiz>");
                 }
                 break;
-            case 5: // Ler inteiro
+            case 5:
                 String input = JOptionPane.showInputDialog(null, "Entrada para syscall 5 (ler inteiro):", "Syscall Input", JOptionPane.QUESTION_MESSAGE);
                 try {
                     if (input != null) {
                         registradores.put("$v0", Integer.parseInt(input.trim()));
                     } else {
-                        registradores.put("$v0", 0); // Cancelado
+                        registradores.put("$v0", 0);
                         saidas.add("<Syscall 5: Leitura cancelada, $v0 definido como 0>");
                     }
                 } catch (NumberFormatException e) {
@@ -533,7 +525,7 @@ class SimuladorMIPS32 {
                     saidas.add("<Erro: Syscall 5: Entrada inválida ('"+input+"'), $v0 definido como 0>");
                 }
                 break;
-            case 10: // Sair
+            case 10:
                 saidas.add("-- Syscall 10: Fim do programa --");
                 cont = instrucoes.size();
                 break;
@@ -581,7 +573,7 @@ class SimuladorMIPS32 {
                     if (dados.containsKey(labelLa) || vetores.containsKey(labelLa)) {
                         registradores.put(partes[1], labelLa.hashCode());
                     } else if (rotulos.containsKey(labelLa)) {
-                        registradores.put(partes[1], rotulos.get(labelLa) * 4 + 0x00400000); // Endereço simulado
+                        registradores.put(partes[1], rotulos.get(labelLa) * 4 + 0x00400000);
                     } else {
                         throw new IllegalArgumentException("Label '" + labelLa + "' não encontrado para 'la'");
                     }
@@ -757,9 +749,7 @@ class SimuladorMIPS32 {
     public String obterTextoRegistradores() {
         StringBuilder sb = new StringBuilder("PC (índice): " + cont + " (Endereço: 0x" + String.format("%08X", 0x00400000 + cont * 4) + ")\n");
         List<String> regNomesOrdenados = new ArrayList<>(registradores.keySet());
-        // Simple sort, can be improved to match canonical MIPS order if needed
         regNomesOrdenados.sort(String::compareTo);
-
 
         for (String regNome : regNomesOrdenados) {
              Integer valor = registradores.get(regNome);
@@ -769,8 +759,11 @@ class SimuladorMIPS32 {
     }
 
     public String obterSaidas() {
-        if (saidas.isEmpty()) return "Nenhuma saída do programa.";
-        return String.join("\n", saidas);
+        if (saidas.isEmpty()) {
+            return "Nenhuma saída do programa.";
+        }
+
+        return String.join("", saidas);
     }
 
     public String obterTextoVetores() {
@@ -826,7 +819,6 @@ class SimuladorMIPS32 {
         return String.join("\n", bin);
     }
     
-    // Sobrecarga para compatibilidade com a chamada da GUI que pode não passar o código do editor
     public boolean gerarRelatorio(String caminhoArquivo) {
         return gerarRelatorio(caminhoArquivo, null); 
     }
@@ -847,7 +839,6 @@ class SimuladorMIPS32 {
                  escritor.write("--- Instruções MIPS Carregadas ---\n");
             }
             escritor.write(codigoParaRelatorio + "\n");
-
 
             escritor.write("\n--- Estado dos Registradores (Final) ---\n");
             escritor.write(obterTextoRegistradores());
