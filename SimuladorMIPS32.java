@@ -240,7 +240,7 @@ class SimuladorMIPS32 {
         }
     }
 
-    private void executarInstrucao(String instrucao) {
+        private void executarInstrucao(String instrucao) {
         String[] partes = instrucao.replaceAll(",", "").trim().split("\\s+");
         if (partes.length == 0 || partes[0].isEmpty()) return;
         String opcode = partes[0].toLowerCase();
@@ -255,6 +255,12 @@ class SimuladorMIPS32 {
                     break;
                 case "sub": 
                     registradores.put(partes[1], registradores.get(partes[2]) - registradores.get(partes[3]));
+                    break;
+                case "mult": // <-- NOVA INSTRUÇÃO ADICIONADA AQUI
+                    // Versão simplificada de 'mult'. MIPS real usa registradores HI/LO.
+                    // Formato: mult rd, rs, rt
+                    if (partes.length < 4) throw new IllegalArgumentException("Instrução 'mult' simplificada requer 3 operandos (rd, rs, rt).");
+                    registradores.put(partes[1], registradores.get(partes[2]) * registradores.get(partes[3]));
                     break;
                 case "and": 
                     registradores.put(partes[1], registradores.get(partes[2]) & registradores.get(partes[3]));
@@ -276,6 +282,10 @@ class SimuladorMIPS32 {
                     break;
                 case "li": 
                     registradores.put(partes[1], Integer.decode(partes[2]));
+                    break;
+                case "lui":
+                    if (partes.length < 3) throw new IllegalArgumentException("Instrução 'lui' requer 2 operandos (rt, immediate).");
+                    registradores.put(partes[1], Integer.decode(partes[2]) << 16);
                     break;
                 case "la": 
                     String labelLa = partes[2];
@@ -308,41 +318,41 @@ class SimuladorMIPS32 {
                     }
 
                     if (registradores.containsKey(base)) {
-                         throw new UnsupportedOperationException(opcode+" com registrador '" + base +"' como base direta não é suportado da forma esperada. Base deve ser um label de dados/vetor.");
+                         throw new UnsupportedOperationException(opcode+" com registrador '" + base +"' como base direta não é suportado. Base deve ser um label de dados.");
                     }
 
                     if (vetores.containsKey(base)) {
                         ArrayList<Integer> vetor = vetores.get(base);
-                        if (offset % 4 != 0) throw new IllegalArgumentException(opcode+": offset (" + offset + ") deve ser múltiplo de 4 para acesso a palavras em '" + instrucao + "'.");
+                        if (offset % 4 != 0) throw new IllegalArgumentException(opcode+": offset (" + offset + ") deve ser múltiplo de 4 para acesso a palavras.");
                         int indice = offset / 4;
                         if (indice >= 0 && indice < vetor.size()) {
                             if (opcode.equals("lw")) {
                                 registradores.put(rt, vetor.get(indice));
                             } else {
-                                if (!registradores.containsKey(rt)) throw new IllegalArgumentException("sw: Registrador fonte '" + rt + "' não encontrado em '" + instrucao + "'.");
+                                if (!registradores.containsKey(rt)) throw new IllegalArgumentException("sw: Registrador fonte '" + rt + "' não encontrado.");
                                 vetor.set(indice, registradores.get(rt));
                             }
                         } else {
-                            throw new ArrayIndexOutOfBoundsException(opcode+": Acesso fora dos limites ao vetor '" + base + "' com offset " + offset + " (índice " + indice + "). Tamanho do vetor: " + vetor.size() + " em '" + instrucao + "'.");
+                            throw new ArrayIndexOutOfBoundsException(opcode+": Acesso fora dos limites ao vetor '" + base + "'.");
                         }
                     } else if (dados.containsKey(base) && dados.get(base) instanceof Integer) {
                         if (offset == 0) {
                             if (opcode.equals("lw")) {
                                 registradores.put(rt, (Integer) dados.get(base));
                             } else {
-                                if (!registradores.containsKey(rt)) throw new IllegalArgumentException("sw: Registrador fonte '" + rt + "' não encontrado em '" + instrucao + "'.");
+                                if (!registradores.containsKey(rt)) throw new IllegalArgumentException("sw: Registrador fonte '" + rt + "' não encontrado.");
                                 dados.put(base, registradores.get(rt));
                             }
                         } else {
-                            throw new IllegalArgumentException(opcode+": Offset deve ser 0 para acessar um item .word único ('" + base + "'). Offset recebido: " + offset + " em '" + instrucao + "'.");
+                            throw new IllegalArgumentException(opcode+": Offset deve ser 0 para acessar um item .word único ('" + base + "').");
                         }
                     } else {
-                        throw new IllegalArgumentException(opcode+": Label '" + base + "' não encontrado como vetor ou dado .word em '" + instrucao + "'.");
+                        throw new IllegalArgumentException(opcode+": Label '" + base + "' não encontrado como vetor ou dado .word.");
                     }
                     break;
                 case "move":
-                     if (partes.length < 3) throw new IllegalArgumentException("Instrução 'move' malformada: " + instrucao);
-                     if (!registradores.containsKey(partes[1]) || !registradores.containsKey(partes[2])) throw new IllegalArgumentException("Registrador não encontrado para 'move' em '" + instrucao + "'.");
+                     if (partes.length < 3) throw new IllegalArgumentException("Instrução 'move' malformada.");
+                     if (!registradores.containsKey(partes[1]) || !registradores.containsKey(partes[2])) throw new IllegalArgumentException("Registrador não encontrado para 'move'.");
                      registradores.put(partes[1], registradores.get(partes[2]));
                      break;
                 case "j": 
@@ -352,8 +362,21 @@ class SimuladorMIPS32 {
                         throw new IllegalArgumentException("Rótulo '" + partes[1] + "' não encontrado para 'j'");
                     }
                     break;
+                case "jal":
+                    if (partes.length < 2) throw new IllegalArgumentException("Instrução 'jal' requer um label.");
+                    if (rotulos.containsKey(partes[1])) {
+                        registradores.put("$ra", cont + 1);
+                        cont = rotulos.get(partes[1]);
+                    } else {
+                        throw new IllegalArgumentException("Rótulo '" + partes[1] + "' não encontrado para 'jal'");
+                    }
+                    break;
+                case "jr":
+                    if (partes.length < 2) throw new IllegalArgumentException("Instrução 'jr' requer um registrador.");
+                    cont = registradores.get(partes[1]);
+                    break;
                 case "beq": 
-                    if (!registradores.containsKey(partes[1]) || !registradores.containsKey(partes[2])) throw new IllegalArgumentException("Registrador não encontrado para 'beq' em '" + instrucao + "'.");
+                    if (!registradores.containsKey(partes[1]) || !registradores.containsKey(partes[2])) throw new IllegalArgumentException("Registrador não encontrado para 'beq'.");
                     if (registradores.get(partes[1]).equals(registradores.get(partes[2]))) {
                         if (rotulos.containsKey(partes[3])) {
                             cont = rotulos.get(partes[3]);
@@ -363,7 +386,7 @@ class SimuladorMIPS32 {
                     }
                     break;
                 case "bne":
-                     if (!registradores.containsKey(partes[1]) || !registradores.containsKey(partes[2])) throw new IllegalArgumentException("Registrador não encontrado para 'bne' em '" + instrucao + "'.");
+                     if (!registradores.containsKey(partes[1]) || !registradores.containsKey(partes[2])) throw new IllegalArgumentException("Registrador não encontrado para 'bne'.");
                      if (!registradores.get(partes[1]).equals(registradores.get(partes[2]))) {
                         if (rotulos.containsKey(partes[3])) {
                             cont = rotulos.get(partes[3]);
@@ -374,16 +397,14 @@ class SimuladorMIPS32 {
                     break;
                 default:
                     String erroMsgDefault = "Instrução não reconhecida ou não implementada: " + opcode + " em '" + instrucao + "'";
-                    System.err.println(erroMsgDefault);
-                    saidas.add("<ERRO: " + erroMsgDefault + ">");
+                    throw new IllegalArgumentException(erroMsgDefault);
             }
         } catch (Exception e) {
             String erroMsgExec = "Erro ao executar instrução '" + instrucao + "': " + e.getMessage();
-            System.err.println(erroMsgExec);
-            saidas.add("<ERRO FATAL: " + erroMsgExec + ". Execução interrompida.>");
-            cont = instrucoes.size(); 
+            throw new RuntimeException(erroMsgExec, e);
         }
     }
+
 
     private String traduzirParaBinario(String instrucao) {
         String[] partes = instrucao.replaceAll(",", "").trim().split("\\s+");

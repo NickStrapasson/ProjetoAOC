@@ -15,6 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Nicolas Strapasson RA: a2670003
+ * Nathália Rodrigues RA: a2670097
+ */
+
+
+
+/**
  * Define a interface gráfica (GUI) para o Simulador MIPS.
  * Esta classe é responsável por criar a janela, os botões, as áreas de texto
  * e por gerenciar as interações do usuário, como carregar arquivos,

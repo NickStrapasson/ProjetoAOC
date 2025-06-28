@@ -1,0 +1,54 @@
+# --- Caso de Teste Acesso a Vetor e Soma ---
+# Objetivo: Somar todos os elementos de um vetor e imprimir o resultado.
+# Testa: lw, addi, add, la, li, move, syscalls.
+# Nota: Este código foi adaptado para funcionar com a lógica de acesso à
+# memória do simulador atual, que utiliza o formato 'offset(label)'.
+
+.data
+    vetor:      .word   10, 20, 5, 15, 50  # Vetor com 5 palavras (words)
+    resultado:  .asciiz "A soma dos elementos do vetor eh: "
+    newline:    .asciiz "\n"
+
+.text
+main:
+    # Este teste irá somar os elementos do vetor manualmente, um por um,
+    # para demonstrar o funcionamento correto das instruções lw, add e addi.
+    
+    li $s0, 0           # $s0 será o nosso acumulador da soma. Inicia em 0.
+
+    # Carrega e soma cada elemento do vetor
+    lw $t0, 0(vetor)    # Carrega vetor[0] (valor 10) em $t0
+    add $s0, $s0, $t0   # soma = soma + 10
+
+    lw $t0, 4(vetor)    # Carrega vetor[1] (valor 20) em $t0. Offset de 4 bytes.
+    add $s0, $s0, $t0   # soma = soma + 20
+
+    lw $t0, 8(vetor)    # Carrega vetor[2] (valor 5) em $t0. Offset de 8 bytes.
+    add $s0, $s0, $t0   # soma = soma + 5
+
+    lw $t0, 12(vetor)   # Carrega vetor[3] (valor 15) em $t0. Offset de 12 bytes.
+    add $s0, $s0, $t0   # soma = soma + 15
+
+    lw $t0, 16(vetor)   # Carrega vetor[4] (valor 50) em $t0. Offset de 16 bytes.
+    add $s0, $s0, $t0   # soma = soma + 50
+
+    # Neste ponto, $s0 deve conter o valor 100 (10+20+5+15+50).
+
+    # Imprime a mensagem de resultado
+    li $v0, 4
+    la $a0, resultado
+    syscall
+
+    # Imprime a soma calculada ($s0)
+    li $v0, 1
+    move $a0, $s0
+    syscall
+
+    # Imprime uma nova linha para formatação
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Finaliza o programa
+    li $v0, 10
+    syscall

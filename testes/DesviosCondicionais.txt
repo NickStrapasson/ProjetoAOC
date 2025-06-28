@@ -1,0 +1,63 @@
+# --- Caso de Teste 2: Desvios Condicionais ---
+# Objetivo: Ler dois números e determinar qual é o maior.
+# Testa: slt, beq, j, syscalls de leitura e impressão.
+
+.data
+    prompt1: .asciiz "Digite o primeiro numero (A): "
+    prompt2: .asciiz "\nDigite o segundo numero (B): "
+    msg_a_maior: .asciiz "\nO numero A eh maior."
+    msg_b_maior: .asciiz "\nO numero B eh maior."
+    msg_iguais:  .asciiz "\nOs numeros sao iguais."
+
+.text
+main:
+    # Ler o primeiro número (A) e salvar em $s0
+    li $v0, 4
+    la $a0, prompt1
+    syscall
+    li $v0, 5
+    syscall
+    move $s0, $v0
+
+    # Ler o segundo número (B) e salvar em $s1
+    li $v0, 4
+    la $a0, prompt2
+    syscall
+    li $v0, 5
+    syscall
+    move $s1, $v0
+
+    # Compara se A < B. Se for, $t0 = 1, senão $t0 = 0.
+    slt $t0, $s0, $s1   # $t0 = 1 se ($s0 < $s1)
+
+    # Se $t0 for 1, significa que A < B, então B é maior.
+    # beq $t0, 1, b_eh_maior  # beq não funciona com imediato, então usamos um registrador
+    li $t1, 1
+    beq $t0, $t1, b_eh_maior
+
+    # Se não pulou, A não é menor que B. Agora vemos se são iguais.
+    beq $s0, $s1, sao_iguais
+
+    # Se não é menor e não é igual, então A > B.
+a_eh_maior:
+    li $v0, 4
+    la $a0, msg_a_maior
+    syscall
+    j fim
+
+b_eh_maior:
+    li $v0, 4
+    la $a0, msg_b_maior
+    syscall
+    j fim
+
+sao_iguais:
+    li $v0, 4
+    la $a0, msg_iguais
+    syscall
+    j fim
+
+fim:
+    # Finaliza o programa
+    li $v0, 10
+    syscall
