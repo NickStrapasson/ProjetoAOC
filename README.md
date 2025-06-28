@@ -8,8 +8,8 @@ Este é um simulador simples para a arquitetura MIPS32, desenvolvido em Java com
 
 ## Como Compilar e Executar
 
-O projeto consiste em dois arquivos principais: `MIPS_GUI.java` e `SimuladorMIPS32.java`. Para utilizá-lo, siga os passos abaixo.
-Caso os passos não funcionem, apenas compile o arquivo MIPS_GUI.java normalmente no editor de texto (tenha certeza que as ferramentas java estejam atualizadas)
+O projeto consiste em dois arquivos principais: `MIPS_GUI.java` e `SimuladorMIPS32.java`. Para utilizá-lo, siga os passos abaixo.-
+Caso os passos não funcionem, apenas compile o arquivo `MIPS_GUI.java` normalmente no editor de texto (tenha certeza que as ferramentas java estejam atualizadas)
 
 1.  **Salve os Arquivos:**
     Certifique-se de que ambos os arquivos (`MIPS_GUI.java` e `SimuladorMIPS32.java`) estão salvos no mesmo diretório.
