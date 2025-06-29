@@ -1,0 +1,174 @@
+# --- Caso de Teste 3 (Corrigido): Demonstração de Operações ---
+# Objetivo: Executar um conjunto de operações lógicas, aritméticas,
+# de memória e condicionais para validar a implementação do simulador.
+# Testa: ADD, ADDI, SUB, MULT, AND, OR, SLL, LW, SW, LUI, SLT, SLTI
+# e as syscalls de impressão e saída.
+
+.data
+    # --- Variáveis Iniciais ---
+    valor_a: .word 15          # Um valor para testes (em binário: 0000 1111)
+    valor_b: .word 6           # Outro valor para testes (em binário: 0000 0110)
+
+    # --- Área para armazenar os resultados ---
+    array_resultados: .space 32 # Espaço para 8 resultados de 4 bytes cada
+
+    # --- Strings para Impressão ---
+    msg_titulo:    .asciiz "--- DEMONSTRACAO DE OPERACOES MIPS ---\n\n"
+    msg_add:       .asciiz "ADD (15 + 6)         = "
+    msg_sub:       .asciiz "SUB (15 - 6)         = "
+    msg_mult:      .asciiz "MULT (15 * 6)        = "
+    msg_addi:      .asciiz "ADDI (15 + 100)      = "
+    msg_and:       .asciiz "AND (15 & 6)         = "
+    msg_or:        .asciiz "OR (15 | 6)          = "
+    msg_sll:       .asciiz "SLL (15 << 2)        = "
+    msg_slt:       .asciiz "SLT (15 < 6 ?)       = "
+    msg_slti_true: .asciiz "SLTI (15 < 20 ?)     = "
+    msg_lui:       .asciiz "LUI (carrega 255)    = "
+    newline:       .asciiz "\n"
+
+.text
+main:
+    # --- Etapa 1: Carregar valores iniciais da memória para registradores ---
+    lw $s0, valor_a       # $s0 = 15
+    lw $s1, valor_b       # $s1 = 6
+
+    # --- Etapa 2: Realizar operações e salvar resultados em registradores temporários ---
+    add  $t0, $s0, $s1     # $t0 = 15 + 6  = 21
+    sub  $t1, $s0, $s1     # $t1 = 15 - 6  = 9
+    mult $t2, $s0, $s1     # $t2 = 15 * 6  = 90 (usando a mult simplificada)
+    addi $t3, $s0, 100    # $t3 = 15 + 100 = 115
+    and  $t4, $s0, $s1     # $t4 = 15 & 6   = 6
+    or   $t5, $s0, $s1     # $t5 = 15 | 6   = 15
+    sll  $t6, $s0, 2       # $t6 = 15 << 2  = 60
+    slt  $t7, $s0, $s1     # $t7 = (15 < 6) ? 1 : 0 => 0 (Falso)
+    
+    # --- Etapa 3: Armazenar os resultados da Etapa 2 na memória ---
+    sw $t0, 0(array_resultados)
+    sw $t1, 4(array_resultados)
+    sw $t2, 8(array_resultados)
+    sw $t3, 12(array_resultados)
+    sw $t4, 16(array_resultados)
+    sw $t5, 20(array_resultados)
+    sw $t6, 24(array_resultados)
+    sw $t7, 28(array_resultados)
+
+    # --- Etapa 4: Imprimir tudo de forma organizada (UMA INSTRUÇÃO POR LINHA) ---
+    li $v0, 4
+    la $a0, msg_titulo
+    syscall
+
+    # Imprime resultado da SOMA
+    li $v0, 4
+    la $a0, msg_add
+    syscall
+    li $v0, 1
+    lw $a0, 0(array_resultados)
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Imprime resultado da SUBTRACAO
+    li $v0, 4
+    la $a0, msg_sub
+    syscall
+    li $v0, 1
+    lw $a0, 4(array_resultados)
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+    
+    # Imprime resultado da MULTIPLICACAO
+    li $v0, 4
+    la $a0, msg_mult
+    syscall
+    li $v0, 1
+    lw $a0, 8(array_resultados)
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Imprime resultado da ADDI
+    li $v0, 4
+    la $a0, msg_addi
+    syscall
+    li $v0, 1
+    lw $a0, 12(array_resultados)
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Imprime resultado do AND
+    li $v0, 4
+    la $a0, msg_and
+    syscall
+    li $v0, 1
+    lw $a0, 16(array_resultados)
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Imprime resultado do OR
+    li $v0, 4
+    la $a0, msg_or
+    syscall
+    li $v0, 1
+    lw $a0, 20(array_resultados)
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Imprime resultado do SLL
+    li $v0, 4
+    la $a0, msg_sll
+    syscall
+    li $v0, 1
+    lw $a0, 24(array_resultados)
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Imprime resultado do SLT
+    li $v0, 4
+    la $a0, msg_slt
+    syscall
+    li $v0, 1
+    lw $a0, 28(array_resultados)
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Demonstração do SLTI
+    slti $t0, $s0, 20
+    li $v0, 4
+    la $a0, msg_slti_true
+    syscall
+    li $v0, 1
+    move $a0, $t0
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # Demonstração do LUI
+    lui $t0, 255
+    li $v0, 4
+    la $a0, msg_lui
+    syscall
+    li $v0, 1
+    move $a0, $t0
+    syscall
+    li $v0, 4
+    la $a0, newline
+    syscall
+
+    # --- Etapa 5: Finalizar o programa ---
+    li $v0, 10
+    syscall
