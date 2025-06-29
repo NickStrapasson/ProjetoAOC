@@ -256,12 +256,6 @@ class SimuladorMIPS32 {
                 case "sub": 
                     registradores.put(partes[1], registradores.get(partes[2]) - registradores.get(partes[3]));
                     break;
-                case "mult": // <-- NOVA INSTRUÇÃO ADICIONADA AQUI
-                    // Versão simplificada de 'mult'. MIPS real usa registradores HI/LO.
-                    // Formato: mult rd, rs, rt
-                    if (partes.length < 4) throw new IllegalArgumentException("Instrução 'mult' simplificada requer 3 operandos (rd, rs, rt).");
-                    registradores.put(partes[1], registradores.get(partes[2]) * registradores.get(partes[3]));
-                    break;
                 case "and": 
                     registradores.put(partes[1], registradores.get(partes[2]) & registradores.get(partes[3]));
                     break;
