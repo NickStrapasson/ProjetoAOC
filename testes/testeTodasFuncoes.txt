@@ -16,7 +16,6 @@
     msg_titulo:    .asciiz "--- DEMONSTRACAO DE OPERACOES MIPS ---\n\n"
     msg_add:       .asciiz "ADD (15 + 6)         = "
     msg_sub:       .asciiz "SUB (15 - 6)         = "
-    msg_mult:      .asciiz "MULT (15 * 6)        = "
     msg_addi:      .asciiz "ADDI (15 + 100)      = "
     msg_and:       .asciiz "AND (15 & 6)         = "
     msg_or:        .asciiz "OR (15 | 6)          = "
@@ -35,8 +34,7 @@ main:
     # --- Etapa 2: Realizar operações e salvar resultados em registradores temporários ---
     add  $t0, $s0, $s1     # $t0 = 15 + 6  = 21
     sub  $t1, $s0, $s1     # $t1 = 15 - 6  = 9
-    mult $t2, $s0, $s1     # $t2 = 15 * 6  = 90 (usando a mult simplificada)
-    addi $t3, $s0, 100    # $t3 = 15 + 100 = 115
+    addi $t3, $s0, 100     # $t3 = 15 + 100 = 115
     and  $t4, $s0, $s1     # $t4 = 15 & 6   = 6
     or   $t5, $s0, $s1     # $t5 = 15 | 6   = 15
     sll  $t6, $s0, 2       # $t6 = 15 << 2  = 60
@@ -78,17 +76,7 @@ main:
     li $v0, 4
     la $a0, newline
     syscall
-    
-    # Imprime resultado da MULTIPLICACAO
-    li $v0, 4
-    la $a0, msg_mult
-    syscall
-    li $v0, 1
-    lw $a0, 8(array_resultados)
-    syscall
-    li $v0, 4
-    la $a0, newline
-    syscall
+
 
     # Imprime resultado da ADDI
     li $v0, 4
